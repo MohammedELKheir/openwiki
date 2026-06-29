@@ -653,10 +653,14 @@ function ErrorDiagnosticsPanel({
 }
 
 function Header({
+  compact = false,
   modelId,
+  showLogo = true,
   subtitle,
 }: {
+  compact?: boolean;
   modelId?: string | null;
+  showLogo?: boolean;
   subtitle: string;
 }) {
   const terminalColumns = process.stdout.columns ?? 80;
@@ -668,14 +672,38 @@ function Header({
     formatCwd(process.cwd()),
     Math.max(8, terminalColumns - 17),
   );
-  const showLogo = terminalColumns > OPENWIKI_LOGO_WIDTH;
+  const shouldShowLogo = showLogo && terminalColumns > OPENWIKI_LOGO_WIDTH;
   const tracingEnabled =
     process.env.LANGCHAIN_TRACING_V2 === "true" &&
     Boolean(process.env.LANGSMITH_API_KEY);
 
+  if (compact) {
+    return (
+      <Box flexDirection="column" marginBottom={1}>
+        <Text wrap="truncate">
+          <Text color="cyan">{">_ "}</Text>
+          <Text bold>OpenWiki</Text>{" "}
+          <Text color="gray">v{OPENWIKI_VERSION}</Text>{" "}
+          <Text color="gray">model: </Text>
+          <Text color="white">{displayModelId}</Text>
+        </Text>
+        <Text>
+          <Text color={tracingEnabled ? "green" : "gray"}>
+            {tracingEnabled ? "* " : "- "}
+          </Text>
+          <Text color={tracingEnabled ? "green" : "gray"}>
+            LangSmith tracing {tracingEnabled ? "enabled" : "disabled"}
+          </Text>
+          <Text color="gray"> - </Text>
+          <Text color="cyan">{subtitle}</Text>
+        </Text>
+      </Box>
+    );
+  }
+
   return (
     <Box flexDirection="column" marginBottom={1}>
-      {showLogo ? (
+      {shouldShowLogo ? (
         <Box flexDirection="column" marginBottom={1}>
           {OPENWIKI_LOGO_LINES.map((line) => (
             <Text bold color="cyan" key={line} wrap="truncate">
@@ -788,7 +816,9 @@ function RunView({
   return (
     <Box flexDirection="column">
       <Header
+        compact
         modelId={modelId}
+        showLogo={false}
         subtitle={done ? "Run complete" : "Agent running"}
       />
       {message ? <PromptBlock message={message} /> : null}
