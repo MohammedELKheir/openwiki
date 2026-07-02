@@ -5,6 +5,9 @@ export const FIREWORKS_API_KEY_ENV_KEY = "FIREWORKS_API_KEY";
 export const OPENAI_API_KEY_ENV_KEY = "OPENAI_API_KEY";
 export const ANTHROPIC_API_KEY_ENV_KEY = "ANTHROPIC_API_KEY";
 export const OPENROUTER_API_KEY_ENV_KEY = "OPENROUTER_API_KEY";
+export const ZAI_API_KEY_ENV_KEY = "ZAI_API_KEY";
+export const ZAI_OPENAI_BASE_URL = "https://api.z.ai/api/coding/paas/v4";
+export const ZAI_ANTHROPIC_BASE_URL = "https://api.z.ai/api/anthropic";
 export const OPENWIKI_PROVIDER_ENV_KEY = "OPENWIKI_PROVIDER";
 export const OPENWIKI_MODEL_ID_ENV_KEY = "OPENWIKI_MODEL_ID";
 export const DEFAULT_PROVIDER = "openrouter";
@@ -15,7 +18,8 @@ export type OpenWikiProvider =
   | "baseten"
   | "fireworks"
   | "openai"
-  | "openrouter";
+  | "openrouter"
+  | "zai";
 
 export type SelectableOpenWikiProvider = OpenWikiProvider;
 
@@ -37,6 +41,7 @@ export const SELECTABLE_OPENWIKI_PROVIDERS = [
   "fireworks",
   "openai",
   "anthropic",
+  "zai",
 ] as const satisfies readonly SelectableOpenWikiProvider[];
 
 export const PROVIDER_CONFIGS: Record<OpenWikiProvider, ProviderConfig> = {
@@ -90,6 +95,15 @@ export const PROVIDER_CONFIGS: Record<OpenWikiProvider, ProviderConfig> = {
       { id: "anthropic/claude-sonnet-5", label: "Claude Sonnet" },
       { id: "openai/gpt-5.4-mini", label: "GPT 5.4 mini" },
       { id: "openai/gpt-5.5", label: "GPT 5.5" },
+    ],
+  },
+  zai: {
+    apiKeyEnvKey: ZAI_API_KEY_ENV_KEY,
+    baseURL: ZAI_ANTHROPIC_BASE_URL,
+    label: "Z.AI",
+    modelOptions: [
+      { id: "glm-5.1", label: "GLM 5.1" },
+      { id: "glm-5.2", label: "GLM 5.2" },
     ],
   },
 };
@@ -149,6 +163,7 @@ export function resolveConfiguredProvider(
 ): OpenWikiProvider {
   return (
     normalizeProvider(env[OPENWIKI_PROVIDER_ENV_KEY]) ??
+    (env[ZAI_API_KEY_ENV_KEY] ? "zai" : undefined) ??
     (env[OPENROUTER_API_KEY_ENV_KEY] ? "openrouter" : DEFAULT_PROVIDER)
   );
 }
