@@ -102,8 +102,8 @@ export const PROVIDER_CONFIGS: Record<OpenWikiProvider, ProviderConfig> = {
     baseURL: ZAI_ANTHROPIC_BASE_URL,
     label: "Z.AI",
     modelOptions: [
-      { id: "glm-5.1", label: "GLM 5.1" },
       { id: "glm-5.2", label: "GLM 5.2" },
+      { id: "glm-5.1", label: "GLM 5.1" },
     ],
   },
 };
