@@ -1,4 +1,4 @@
-import { mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
+import { mkdir, mkdtemp, readFile, rm, writeFile } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { afterEach, describe, expect, test } from "vitest";
@@ -118,5 +118,22 @@ describe("ensureCodeModeRepoSetup workflow", () => {
     ]) {
       expect(workflow).toContain(managedPath);
     }
+  });
+
+  test("preserves an existing project-specific workflow", async () => {
+    const repo = await createTempRepo();
+    const workflowPath = path.join(
+      repo,
+      ".github",
+      "workflows",
+      "openwiki-update.yml",
+    );
+    const existing = "name: Custom Z.AI OpenWiki workflow\n";
+    await mkdir(path.dirname(workflowPath), { recursive: true });
+    await writeFile(workflowPath, existing, "utf8");
+
+    await ensureCodeModeRepoSetup(repo);
+
+    expect(await readIfPresent(workflowPath)).toBe(existing);
   });
 });

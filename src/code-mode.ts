@@ -28,6 +28,16 @@ async function writeCodeModeWorkflow(
     "workflows",
     "openwiki-update.yml",
   );
+
+  try {
+    await readFile(workflowPath, "utf8");
+    return;
+  } catch (error) {
+    if (!isFileNotFoundError(error)) {
+      throw error;
+    }
+  }
+
   await mkdir(path.dirname(workflowPath), { recursive: true });
   await writeFile(workflowPath, createCodeModeWorkflow(cronExpression), "utf8");
 }
